@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artifact Viewer</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(to bottom, #e8f5e9, #c8e6c9);
+    color: #1b5e20;
+  }
+
+  header {
+    background: #2e7d32;
+    color: white;
+    padding: 18px;
+    font-size: 26px;
+    font-weight: bold;
+    text-align: center;
+  } 
+
+  .container {
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 950px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+
+    display: flex;
+    gap: 25px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  #image {
+    width: 380px;
+    max-width: 100%;
+    border-radius: 12px;
+    display: none;
+    transition: opacity 0.5s ease;
+  }
+
+  .text {
+    flex: 1;
+    min-width: 260px;
+    text-align: left;
+  }
+
+  #title {
+    font-size: 26px;
+    margin-bottom: 10px;
+    color: #1b5e20;
+  }
+
+  .desc {
+    font-size: 18px;
+    line-height: 1.7;
+    white-space: pre-line;
+  }
+
+  .idle {
+    font-size: 18px;
+    color: #2e7d32;
+    margin-top: 15px;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .text {
+      text-align: center;
+    }
+
+    #image {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<header>
+  🌿 Artifact Display System
+</header>
+
+<div class="container">
+
+  <img id="image">
+
+  <div class="text">
+    <h2 id="title">Scan a QR Code</h2>
+    <p id="desc" class="desc"></p>
+    <p id="idle" class="idle">Waiting for scan...</p>
+  </div>
+
+  <audio id="audio"></audio>
+
+</div>
+
+<script>
+const artifacts = {
+  artifact1: {
+    title: "Gangsa",
+    image: "images/gangsa.png",
+    audio: "audio/gangsa.mp3",
+    desc: `Is a single hand-held smooth-surfaced gong with a narrow rim. 
+            A set of gangsa, which is played one gong per musician, consists of gangsa tuned to different notes, depending on regional or local cultural preferences. 
+            The number of gangsa in a set varies with availability, and depends on the tradition of a particular ethnic group of the Luzon Cordillera: Kalinga, Ifugao, Bontoc etc.
+            Among the Kalinga people in the Cordillera region of Luzon Island, the gangsa is played in two ways. One way is called "toppaya" and the other is called "pattung." In "toppaya" style, the musicians play the surface of the gangsa with their hand while in a sitting position, with a single gangsa resting on the lap of each musician. 
+            In the "pattung" style, a gangsa is suspended from the musician's left hand and played with a padded stick held in the musician's right hand. In the "pattung" style of playing, the players are standing, or they keep in step with the dancers while bending forward slightly.
+    `
+  },
+
+  artifact2: {
+    title: "Uppaya",
+    image: "images/uppaya.png",
+    audio: "audio/uppaya.mp3",
+    desc: ` The traditional Uppaya basket, an important cultural artifact from the Kalinga people of the Northern Philippines. 
+            The Uppaya Basket is a specialized woven container traditionally used for carrying and storing fish, particularly eels caught in mountain streams and rice paddies. 
+            Its design is highly functional. The hexagonal patterns allow water to drain quickly while keeping the catch secure.
+            It is typically hand-woven from sturdy natural vines like rattan or split bamboo. It often features a wider mouth and a tapered base, making it easy to handle while wading through water. The basket is commonly used to carry agricultural products like rice and vegetables, representing the importance of farming in their daily lives. During cultural celebrations such as the Uppaya Festival, the Uppaya basket also serves as a symbol of gratitude, cooperation, and the preservation of ancestral traditions.
+    `
+  },
+
+  artifact3: {
+    title: "Byanga",
+    image: "images/byanga.png",
+    audio: "audio/byanga.mp3",
+    desc: ` The byanga or earthen pots were part of the olden iLubuagen’s everyday life. 
+            Hence, the chuwin chi byanga (which literally means “making of pots”) or pottery. The iLubuagens have several byanga with different uses. There is the uppaya or stock pot where they stock soup that is prepared by long and slow cooking, the kattuyum or rice cooker pot, the byilungkayawan or water jar where they store their drinking water fetched from the springs, the amutu or the jar where their sugarcane wine is fermented, and the uggatit or the smallest pot.
+            The upayya is said to have a wide mouth so a soup ladle can easily fit in it when mixing and serving soup. The kattuyum is said to have a small mouth so rice can easily be steamed.
+            On the other hand, people associate children with fragile pots. Hence, in the past, a dead baby is laid inside the byilungkayawan when it is to be buried. In the case of miscarriage, the fetus is laid inside an uggatit. 
+            Nowadays, most heirloom byanga are only displayed as house decorations due to their rarity while the newly crafted ones are used in the performance of the byanga dance (a kind of traditional dance where women carry a set of byanga on their heads) during cultural affairs. A complete byanga set is a collection of half a dozen pots.
+    `
+  },
+
+  artifact4: {
+    title: "Pasiking",
+    image: "images/pasiking.png",
+    audio: "audio/pasiking.mp3",
+    desc: ` The Basketry is a time-honored tradition in the Northern Luzon Cordillera where the weaving of baskets from vegetable fibers is considered an essential skill among the natives of the region, from Apayao to Abra.
+            Whether done for mundane activities or for special events, baskets are part and parcel of communal life, and their astounding variety serves as cultural signifiers that speaks of the ethos of local communities.
+            Of the various types of baskets produced in the region, the most famous it is because it is the most ubiquitous is the native backpack known as pasiking. In places frequented by tourists, particularly in the city of Baguio the pasiking is paddled everywhere, enthusiastically consumed by souvenir hunters and fans of ethnic chic. 
+    `
+  },
+
+  artifact5: {
+    title: "Bungkaka",
+    image: "images/bungkaka.png",
+    audio: "audio/bungkaka.mp3",
+    desc: ` The Bungkaka, also known as the bamboo buzzer, is a traditional musical instrument indigenous to the Cordillera region of the Philippines. This instrument is made primarily of bamboo and is characterized by its slit design, which produces a buzzing sound when struck against the palm. 
+            The Bungkaka is an idiophone, meaning it produces sound through the vibration of its own material without the need for strings, membranes, or external resonators. Typically, it is constructed from a segment of bamboo, with one end closed and the other open. A longitudinal slit is cut near the closed end, creating a tongue-like section that vibrates when played.
+            There are variations of the Bungkaka depending on the size and tuning preferences of different indigenous groups. Some are designed for deeper, more resonant tones, while others are crafted for higher-pitched buzzing sounds. While the general structure remains the same, the dimensions, tuning, and additional embellishments may differ. In some cases, decorative carvings and natural stains are used to enhance its aesthetic appeal, reflecting the cultural significance and artistic expression of the local community.
+    `
+  },
+
+  artifact6: {
+    title: "Laga",
+    image: "images/laga.png",
+    audio: "audio/laga.mp3",
+    desc: ` In Kalinga culture, weaving is known as Laga. The textiles you see in the image reflect the identity of the Kalinga people, often characterized by the dominant use of red, which represents bravery, and yellow, symbolizing wealth and hospitality.
+            The Kalinga people have specific names for their traditional attire and the patterns used. Kain is the general term for the wrap-around skirt worn by women. It is typically colorful and decorated with beads and embroidery. Ba-ag is the traditional loincloth worn by Kalinga men.
+            Laga is the art of weaving itself. Silup is a specific technique or pattern where different colored threads are twisted together to create a unique texture or design and Gilamat refers to the intricate embroidery or beadwork often added to the kain to enhance its beauty and show social status.
+    `
+  },
+
+  artifact7: {
+    title: "Salakot",
+    image: "images/salakot.png",
+    audio: "audio/salakot.mp3",
+    desc: ` Salakot, specifically a type known as Tagalen when found in Luzon, Philippines. In the Cordillera region, this handwoven conical hat is a traditional piece of headwear used primarily for protection against the sun and rain while working in the rice terraces or traveling through the mountains. 
+            It has a distinct conical or "pointy" top, often with a wide, circular brim. These hats are traditionally crafted from natural local materials such as leaf strips, rattan, and sometimes reinforced with brass wire.
+            Craftsmanship: They feature intricate weaving patterns that are both functional for durability and artistically significant to the specific ethnic group that created them.
+            Salakot is a traditional lightweight headgear from the Philippines commonly used for protection against the sun and rain. Variants occur among ethnic groups, but all are shaped like a dome or cone and can range in size from having very wide brims to being almost helmet-like. Made from various materials including bamboo, rattan, nito ferns, and bottle gourd, the salakot is held in place by an inner headband and a chinstrap. The tip of the crown commonly has a spiked or knobbed finial made of metal or wood. The salakot is the direct precursor to the pith helmet (also called salacot in Spanish and salacco in French) widely used by European military forces in the colonial.
+    `
+  },
+
+  artifact8: {
+    title: "Igeyd",
+    image: "images/igeyd.png",
+    audio: "audio/igeyd.mp3",
+    desc: ` The Igeyd (also spelled igeyad), a traditional, lesser-known cultural tool from the Cordillera region of the northern Philippines. It appears to be a functional, utilitarian item made of dark wood or iron with a tripod-like base and a horizontal handle or head. 
+            Such objects are deeply tied to the indigenous knowledge and ancestral craftsmanship of ethnic groups like the Ifugao, Bontoc, and Kalinga. Origin in Cordillera Administrative Region (CAR), 
+            Typically carved from local wood or forged from metal, reflecting the region's rich metalworking and woodcarving traditions.
+            Items like this represent the "utilitarian art" of the highlands, where objects used for everyday tasks also symbolize identity and tradition.
+            While the igeyd is unique, it belongs to a broader category of Cordilleran utilitarian and ritual object.
+    `
+  },
+
+  artifact9: {
+    title: "ChokChokChok",
+    image: "images/chokchok.png",
+    audio: "audio/chokchok.mp3",
+    desc:  `A wooden mortar and pestle; a traditional tool used for crushing and grinding ingredients into a fine paste or powder. This specific set appears to be a handmade or antique variety, often carved from durable hardwoods like acacia, mahogany, or oak.
+            Mortar: The heavy bowl where ingredients are placed.
+            Pestle: The blunt, club-shaped tool used for the actual grinding or pounding.
+            Commonly used for spices, herbs, garlic, and ginger.
+            In the Cordillera region of the Philippines, the term "chok-chok" (sometimes written as chokchokchok) is an onomatopoeic word used to describe the repetitive pounding or crushing sound made when using a traditional wooden mortar and pestle.
+            Connection to "Pinikpikan" The term is most famously associated with the preparation of Pinikpikan, a traditional Igorot chicken dish. A live chicken is rhythmically beaten with a small stick—the "chok-chok-chok" sound—to bruise the meat and bring blood to the surface before it is cooked with etag (salted, cured pork). Grinding Spices: Smaller versions of the mortar and pestle are used to "chok-chok" or crush ginger, garlic, and chili for spicy dishes like Binungor.
+    `
+  },
+
+  artifact10: {
+    title: "Tungali",
+    image: "images/tungali.png",
+    audio: "audio/tungali.mp3",
+    desc: ` The Tungali or Inonger is a traditional bamboo nose flute from the Cordillera region, known for its soft, mellow, and expressive sound. 
+            As a solo instrument, it produces music by blowing air through one nostril while the other nostril is closed to control airflow. 
+            It has four finger holes—three in front and one at the back—similar to the Paldong, which allow the player to change pitch and create different musical notes. The instrument can produce tones within a range of about two and a half octaves, making it versatile despite its simple structure.
+            The Tungali is often used for personal expression, courtship, relaxation, and storytelling, as its gentle sound can convey deep emotions. It reflects the creativity and musical tradition of indigenous communities, showing how natural materials like bamboo are transformed into meaningful cultural instruments. Its importance lies not only in its musical function but also in preserving heritage, as it continues to represent the identity, artistry, and traditions of the Cordilleran people.
+        `
+  }
+};
+
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+const titleEl = document.getElementById("title");
+const imageEl = document.getElementById("image");
+const descEl = document.getElementById("desc");
+const idleEl = document.getElementById("idle");
+const audioEl = document.getElementById("audio");
+
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if (!audioUnlocked) {
+    audioEl.play().then(() => {
+      audioEl.pause();
+      audioEl.currentTime = 0;
+      audioUnlocked = true;
+      console.log("Audio unlocked");
+    }).catch(() => {});
+  }
+}
+
+document.body.addEventListener("click", unlockAudio);
+document.body.addEventListener("touchstart", unlockAudio);
+
+function loadArtifact(id) {
+  if (!artifacts[id]) {
+    descEl.innerText = "Please scan a valid QR code.";
+    return;
+  }
+
+  const item = artifacts[id];
+
+  idleEl.style.display = "none";
+
+  titleEl.innerText = item.title;
+  descEl.innerText = item.desc;
+
+  // Image transition
+  imageEl.style.opacity = 0;
+  imageEl.src = item.image;
+  imageEl.style.display = "block";
+
+  setTimeout(() => {
+    imageEl.style.opacity = 1;
+  }, 100);
+
+  audioEl.pause();
+  audioEl.currentTime = 0;
+  audioEl.src = item.audio;
+
+  // Try autoplay
+  setTimeout(() => {
+    audioEl.play().catch(() => {
+      console.log("Autoplay blocked — waiting for user interaction");
+    });
+  }, 400);
+}
+
+if (id) {
+  loadArtifact(id);
+}
+</script>
+
+</body>
+</html>
