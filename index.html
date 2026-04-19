@@ -54,7 +54,6 @@
   #title {
     font-size: 26px;
     margin-bottom: 10px;
-    color: #1b5e20;
   }
 
   .desc {
@@ -67,6 +66,21 @@
     font-size: 18px;
     color: #2e7d32;
     margin-top: 15px;
+  }
+
+  #playBtn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  #playBtn:hover {
+    background: #1b5e20;
   }
 
   @media (max-width: 768px) {
@@ -100,11 +114,15 @@
     <h2 id="title">Scan a QR Code</h2>
     <p id="desc" class="desc"></p>
     <p id="idle" class="idle">Waiting for scan...</p>
+
+    <!-- 🔊 PLAY BUTTON -->
+    <button id="playBtn">🔊 Play Audio</button>
   </div>
 
   <audio id="audio"></audio>
 
 </div>
+
 
 <script>
 const artifacts = {
@@ -229,22 +247,28 @@ const imageEl = document.getElementById("image");
 const descEl = document.getElementById("desc");
 const idleEl = document.getElementById("idle");
 const audioEl = document.getElementById("audio");
+const playBtn = document.getElementById("playBtn");
 
 let audioUnlocked = false;
 
+// Unlock audio for mobile
 function unlockAudio() {
   if (!audioUnlocked) {
     audioEl.play().then(() => {
       audioEl.pause();
       audioEl.currentTime = 0;
       audioUnlocked = true;
-      console.log("Audio unlocked");
     }).catch(() => {});
   }
 }
 
 document.body.addEventListener("click", unlockAudio);
 document.body.addEventListener("touchstart", unlockAudio);
+
+// Manual play
+playBtn.addEventListener("click", () => {
+  audioEl.play();
+});
 
 function loadArtifact(id) {
   if (!artifacts[id]) {
@@ -259,7 +283,6 @@ function loadArtifact(id) {
   titleEl.innerText = item.title;
   descEl.innerText = item.desc;
 
-  // Image transition
   imageEl.style.opacity = 0;
   imageEl.src = item.image;
   imageEl.style.display = "block";
@@ -272,11 +295,9 @@ function loadArtifact(id) {
   audioEl.currentTime = 0;
   audioEl.src = item.audio;
 
-  // Try autoplay
+  // Auto play
   setTimeout(() => {
-    audioEl.play().catch(() => {
-      console.log("Autoplay blocked — waiting for user interaction");
-    });
+    audioEl.play().catch(() => {});
   }, 400);
 }
 
